@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>관리 / 모니터링</h2>
+<p><a href="{{ url_for('index') }}">← DB 목록으로</a></p>
+
+<h3>SQL 실행기</h3>
+<form method="post" action="{{ url_for('execute_sql') }}">
+  <textarea name="sql" rows="6" style="width:100%" placeholder="SELECT * FROM mysql.user;"></textarea>
+  <button type="submit">실행</button>
+</form>
+
+<h3>사용자 생성</h3>
+<form method="post" action="{{ url_for('create_user') }}" class="card">
+  <label>User <input name="user" required></label>
+  <label>Host <input name="host" value="%"></label>
+  <label>Password <input name="password" type="password" required></label>
+  <button type="submit">Create User</button>
+</form>
+
+<h3>사용자 목록/삭제</h3>
+<table>
+<thead><tr><th>User</th><th>Host</th><th>Locked</th><th>Action</th></tr></thead>
+<tbody>
+{% for u in users %}
+<tr>
+  <td>{{ u.user }}</td><td>{{ u.host }}</td><td>{{ u.account_locked }}</td>
+  <td><form method="post" action="{{ url_for('drop_user') }}"><input type="hidden" name="user" value="{{ u.user }}"><input type="hidden" name="host" value="{{ u.host }}"><button class="danger" type="submit">Drop</button></form></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+<h3>Session / Processlist</h3>
+<table><thead><tr><th>Id</th><th>User</th><th>Host</th><th>DB</th><th>Command</th><th>Time</th><th>State</th><th>Kill</th></tr></thead><tbody>
+{% for p in processes %}<tr><td>{{ p.Id }}</td><td>{{ p.User }}</td><td>{{ p.Host }}</td><td>{{ p.db }}</td><td>{{ p.Command }}</td><td>{{ p.Time }}</td><td>{{ p.State }}</td><td><form method="post" action="{{ url_for('kill_process') }}"><input type="hidden" name="pid" value="{{ p.Id }}"><button class="danger" type="submit">Kill</button></form></td></tr>{% endfor %}
+</tbody></table>
+
+<h3>Trigger</h3>
+<table><thead><tr><th>Schema</th><th>Name</th><th>Table</th><th>Timing</th><th>Event</th><th>Action</th></tr></thead><tbody>
+{% for t in triggers %}<tr><td>{{ t.trigger_schema }}</td><td>{{ t.trigger_name }}</td><td>{{ t.event_object_table }}</td><td>{{ t.action_timing }}</td><td>{{ t.event_manipulation }}</td><td><form method='post' action='{{ url_for("drop_trigger") }}'><input type='hidden' name='schema' value='{{ t.trigger_schema }}'><input type='hidden' name='name' value='{{ t.trigger_name }}'><button class='danger' type='submit'>Drop</button></form></td></tr>{% endfor %}
+</tbody></table>
+
+<h3>Event</h3>
+<table><thead><tr><th>Schema</th><th>Name</th><th>Status</th><th>Execute At</th><th>Interval</th><th>Action</th></tr></thead><tbody>
+{% for e in events %}<tr><td>{{ e.event_schema }}</td><td>{{ e.event_name }}</td><td>{{ e.status }}</td><td>{{ e.execute_at }}</td><td>{{ e.interval_value }} {{ e.interval_field }}</td><td><form method='post' action='{{ url_for("drop_event") }}'><input type='hidden' name='schema' value='{{ e.event_schema }}'><input type='hidden' name='name' value='{{ e.event_name }}'><button class='danger' type='submit'>Drop</button></form></td></tr>{% endfor %}
+</tbody></table>
+
+<h3>Global Status (Top 200)</h3>
+<table><thead><tr><th>Variable</th><th>Value</th></tr></thead><tbody>
+{% for s in status %}<tr><td>{{ s.Variable_name }}</td><td>{{ s.Value }}</td></tr>{% endfor %}
+</tbody></table>
+
+
+<h3>Trigger 생성</h3>
+<form method="post" action="{{ url_for('create_trigger') }}" class="card">
+  <label>Schema <input name="schema" required></label>
+  <label>Name <input name="name" required></label>
+  <label>Table <input name="table" required></label>
+  <label>Timing <input name="timing" value="BEFORE"></label>
+  <label>Event <input name="event" value="INSERT"></label>
+  <label>Body <input name="body" value="SET NEW.updated_at = NOW();"></label>
+  <button type="submit">Create Trigger</button>
+</form>
+
+<h3>Event 생성</h3>
+<form method="post" action="{{ url_for('create_event') }}" class="card">
+  <label>Schema <input name="schema" required></label>
+  <label>Name <input name="name" required></label>
+  <label>Schedule <input name="schedule" value="EVERY 1 HOUR"></label>
+  <label>Body <input name="body" value="DO SELECT 1"></label>
+  <button type="submit">Create Event</button>
+</form>
+
+<h3>Export</h3>
+<form method="get" action="{{ url_for('export_schema', schema='__SCHEMA__') }}" onsubmit="this.action=this.action.replace('__SCHEMA__', this.schema.value)">
+  <label>Schema <input name="schema" required></label>
+  <button type="submit">Export .sql</button>
+</form>
+
+
+<h3>권한 부여/회수</h3>
+<form method='post' action='{{ url_for("grant_privilege") }}' class='card'>
+  <label>User <input name='user' required></label>
+  <label>Host <input name='host' value='%'></label>
+  <label>Privilege <input name='privilege' value='SELECT'></label>
+  <label>Schema(* 가능) <input name='schema' value='*'></label>
+  <button type='submit'>Grant</button>
+</form>
+<form method='post' action='{{ url_for("revoke_privilege") }}' class='card'>
+  <label>User <input name='user' required></label>
+  <label>Host <input name='host' value='%'></label>
+  <label>Privilege <input name='privilege' value='SELECT'></label>
+  <label>Schema(* 가능) <input name='schema' value='*'></label>
+  <button class='danger' type='submit'>Revoke</button>
+</form>
+
+<h3>SQL Import</h3>
+<form method='post' action='{{ url_for("import_sql") }}'>
+  <textarea name='sql_blob' rows='8' style='width:100%' placeholder='CREATE TABLE ...; INSERT ...;'></textarea>
+  <button type='submit'>Import 실행</button>
+</form>
+
+
+
+<h3>Trigger 수정</h3>
+<form method='post' action='{{ url_for("update_trigger") }}' class='card'>
+  <label>Schema <input name='schema' required></label>
+  <label>Old Name <input name='old_name' required></label>
+  <label>New Name <input name='name' required></label>
+  <label>Table <input name='table' required></label>
+  <label>Timing <input name='timing' value='BEFORE'></label>
+  <label>Event <input name='event' value='INSERT'></label>
+  <label>Body <input name='body' value='SET NEW.updated_at = NOW();'></label>
+  <button type='submit'>Update Trigger</button>
+</form>
+
+<h3>Event 수정</h3>
+<form method='post' action='{{ url_for("update_event") }}' class='card'>
+  <label>Schema <input name='schema' required></label>
+  <label>Old Name <input name='old_name' required></label>
+  <label>New Name <input name='name' required></label>
+  <label>Schedule <input name='schedule' value='EVERY 1 HOUR'></label>
+  <label>Body <input name='body' value='DO SELECT 1'></label>
+  <button type='submit'>Update Event</button>
+</form>
+
+<h3>View 생성</h3>
+<form method='post' action='{{ url_for("create_view") }}' class='card'>
+  <label>Schema <input name='schema' required></label>
+  <label>Name <input name='name' required></label>
+  <label>Select SQL <input name='select_sql' value='SELECT 1 AS value'></label>
+  <button type='submit'>Create View</button>
+</form>
+
+<h3>Views</h3>
+<table><thead><tr><th>Schema</th><th>Name</th><th>Action</th></tr></thead><tbody>
+{% for v in views %}<tr><td>{{ v.table_schema }}</td><td>{{ v.table_name }}</td><td><form method='post' action='{{ url_for("drop_view") }}'><input type='hidden' name='schema' value='{{ v.table_schema }}'><input type='hidden' name='name' value='{{ v.table_name }}'><button class='danger' type='submit'>Drop</button></form></td></tr>{% endfor %}
+</tbody></table>
+
+<h3>Routines</h3>
+<table><thead><tr><th>Schema</th><th>Name</th><th>Type</th></tr></thead><tbody>
+{% for r in routines %}<tr><td>{{ r.routine_schema }}</td><td>{{ r.routine_name }}</td><td>{{ r.routine_type }}</td></tr>{% endfor %}
+</tbody></table>
+
+{% endblock %}

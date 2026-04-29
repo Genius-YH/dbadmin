@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>SQL 결과</h2>
+<p><code>{{ sql }}</code></p>
+<p><a href="{{ url_for('admin_dashboard') }}">← 돌아가기</a></p>
+{% if rows %}
+<table>
+  <thead><tr>{% for c in rows[0].keys() %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+  <tbody>
+    {% for r in rows %}<tr>{% for c in r.keys() %}<td>{{ r[c] }}</td>{% endfor %}</tr>{% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>반환된 행이 없습니다.</p>
+{% endif %}
+{% endblock %}
