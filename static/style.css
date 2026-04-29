@@ -1,0 +1,6 @@
+a { text-decoration: none; }
+.card form { margin-bottom: 1rem; }
+.card table { width: 100%; }
+.card th, .card td { padding: 0.55rem; border-bottom: 1px solid #eceff5; }
+input, select, textarea { width: 100%; }
+button { margin-top: .35rem; }

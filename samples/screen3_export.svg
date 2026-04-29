@@ -1,0 +1,8 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1400' height='900'>
+<rect width='1400' height='900' fill='#f8f9fa'/><rect width='1400' height='80' fill='#344767'/>
+<text x='30' y='50' fill='white' font-size='28'>DBAdmin Lite - Export (Sample)</text>
+<rect x='40' y='120' width='1320' height='730' fill='white' stroke='#dee2e6'/>
+<text x='80' y='180' font-size='24'>Export schema: mydb</text>
+<text x='80' y='230' font-size='24'>Output: default_mydb.sql</text>
+<text x='80' y='280' font-size='24'>Theme: Argon Dashboard style</text>
+</svg>

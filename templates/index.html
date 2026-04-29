@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>데이터베이스 / 테이블</h2>
+
+<form method="get" action="{{ url_for('index') }}">
+  <label>Connection
+    <select name="conn" onchange="this.form.submit()">
+      {% for c in connections %}
+        <option value="{{ c }}" {% if c == conn_name %}selected{% endif %}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </label>
+</form>
+
+<form method="get" action="{{ url_for('index') }}">
+  <input type="hidden" name="conn" value="{{ conn_name }}">
+  <label>Schema
+    <select name="schema" onchange="this.form.submit()">
+      {% for s in schemas %}
+        <option value="{{ s }}" {% if s == current_schema %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+    </select>
+  </label>
+</form>
+
+<form method="post" action="{{ url_for('schema_create') }}" class="card">
+  <input type="hidden" name="conn" value="{{ conn_name }}">
+  <label>New Schema <input name="schema" required></label>
+  <button type="submit">Create Schema</button>
+</form>
+
+<table>
+  <thead><tr><th>Table</th><th>Rows</th><th>Engine</th><th>Create</th><th>Update</th></tr></thead>
+  <tbody>
+  {% for t in table_rows %}
+  <tr>
+    <td><a href="{{ url_for('table_view', conn=conn_name, schema=current_schema, table_name=t.table_name) }}">{{ t.table_name }}</a></td>
+    <td>{{ t.table_rows }}</td><td>{{ t.engine }}</td><td>{{ t.create_time }}</td><td>{{ t.update_time }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
