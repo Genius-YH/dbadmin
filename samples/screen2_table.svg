@@ -1,0 +1,9 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1400' height='900'>
+<rect width='1400' height='900' fill='#f8f9fa'/><rect width='1400' height='80' fill='#344767'/>
+<text x='30' y='50' fill='white' font-size='28'>DBAdmin Lite - Table View (Sample)</text>
+<rect x='40' y='120' width='1320' height='730' fill='white' stroke='#dee2e6'/>
+<text x='80' y='180' font-size='24'>Table: mydb.users</text>
+<text x='80' y='230' font-size='24'>Columns: id, email, role</text>
+<text x='80' y='280' font-size='24'>Rows: 200</text>
+<text x='80' y='330' font-size='24'>Action: Insert row</text>
+</svg>
